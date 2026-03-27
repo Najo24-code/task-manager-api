@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Tareas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <header class="bg-blue-500 text-white p-4 text-center">
+        <h1 class="text-3xl">Gestión de Tareas</h1>
+    </header>
+    <main class="p-4">
+        <section class="mb-4">
+            <h2 class="text-2xl">Crear Tarea</h2>
+            <form id="create-task-form">
+                <label for="title" class="block text-gray-700">Título:</label>
+                <input type="text" id="title" name="title" class="block w-full p-2 mb-2 border border-gray-400">
+                <label for="description" class="block text-gray-700">Descripción:</label>
+                <textarea id="description" name="description" class="block w-full p-2 mb-2 border border-gray-400"></textarea>
+                <label for="state" class="block text-gray-700">Estado:</label>
+                <select id="state" name="state" class="block w-full p-2 mb-2 border border-gray-400">
+                    <option value="pendiente">Pendiente</option>
+                    <option value="en progreso">En progreso</option>
+                    <option value="completada">Completada</option>
+                </select>
+                <label for="deadline" class="block text-gray-700">Fecha límite:</label>
+                <input type="date" id="deadline" name="deadline" class="block w-full p-2 mb-2 border border-gray-400">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Crear Tarea</button>
+            </form>
+        </section>
+        <section class="mb-4">
+            <h2 class="text-2xl">Listar Tareas</h2>
+            <ul id="task-list" class="list-none p-0 m-0">
+            </ul>
+        </section>
+    </main>
+    <script>
+        const taskList = document.getElementById('task-list');
+        const createTaskForm = document.getElementById('create-task-form');
+
+        // Función para obtener las tareas
+        async function getTasks() {
+            try {
+                const response = await fetch('http://192.168.8.102:8000/tasks/', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                const tasks = await response.json();
+                taskList.innerHTML = '';
+                tasks.forEach(task => {
+                    const taskElement = document.createElement('li');
+                    taskElement.classList.add('bg-gray-100', 'p-2', 'mb-2', 'border', 'border-gray-400');
+                    taskElement.innerHTML = `
+                        <h3 class="text-lg">${task.title}</h3>
+                        <p>${task.description}</p>
+                        <p>Estado: ${task.state}</p>
+                        <p>Fecha límite: ${task.deadline}</p>
+                        <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" onclick="deleteTask(${task.id})">Eliminar</button>
+                        <button class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded" onclick="updateTask(${task.id})">Actualizar</button>
+                    `;
+                    taskList.appendChild(taskElement);
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // Función para crear una tarea
+        async function createTask(event) {
+            event.preventDefault();
+            try {
+                const title = document.getElementById('title').value;
+                const description = document.getElementById('description').value;
+                const state = document.getElementById('state').value;
+                const deadline = document.getElementById('deadline').value;
+                const response = await fetch('http://192.168.8.102:8000/tasks/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        state,
+                        deadline
+                    })
+                });
+                const task = await response.json();
+                getTasks();
+                createTaskForm.reset();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // Función para eliminar una tarea
+        async function deleteTask(id) {
+            try {
+                const response = await fetch(`http://192.168.8.102:8000/tasks/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                getTasks();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // Función para actualizar una tarea
+        async function updateTask(id) {
+            try {
+                const title = prompt('Ingrese el nuevo título');
+                const description = prompt('Ingrese la nueva descripción');
+                const state = prompt('Ingrese el nuevo estado');
+                const deadline = prompt('Ingrese la nueva fecha límite');
+                const response = await fetch(`http://192.168.8.102:8000/tasks/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        state,
+                        deadline
+                    })
+                });
+                getTasks();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        createTaskForm.addEventListener('submit', createTask);
+        getTasks();
+    </script>
+</body>
+</html>
