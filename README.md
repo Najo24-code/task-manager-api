@@ -1,5 +1,8 @@
 # task-manager-api
 
+![CI](https://github.com/Najo24-code/task-manager-api/workflows/CI/badge.svg)
+
+
 API REST de gestión de tareas con autenticación JWT, CRUD completo y SQLite
 
 ![Python](https://img.shields.io/badge/-Python-blue) ![FastAPI](https://img.shields.io/badge/-FastAPI-blue) ![SQLite](https://img.shields.io/badge/-SQLite-blue)
