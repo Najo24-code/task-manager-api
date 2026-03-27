@@ -42,7 +42,7 @@
         // Función para obtener las tareas
         async function getTasks() {
             try {
-                const response = await fetch('http://192.168.8.102:8000/tasks/', {
+                const response = await fetch('http://localhost:8000/tasks/', {
                     method: 'GET',
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -76,7 +76,7 @@
                 const description = document.getElementById('description').value;
                 const state = document.getElementById('state').value;
                 const deadline = document.getElementById('deadline').value;
-                const response = await fetch('http://192.168.8.102:8000/tasks/', {
+                const response = await fetch('http://localhost:8000/tasks/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -100,7 +100,7 @@
         // Función para eliminar una tarea
         async function deleteTask(id) {
             try {
-                const response = await fetch(`http://192.168.8.102:8000/tasks/${id}`, {
+                const response = await fetch(`http://localhost:8000/tasks/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -119,7 +119,7 @@
                 const description = prompt('Ingrese la nueva descripción');
                 const state = prompt('Ingrese el nuevo estado');
                 const deadline = prompt('Ingrese la nueva fecha límite');
-                const response = await fetch(`http://192.168.8.102:8000/tasks/${id}`, {
+                const response = await fetch(`http://localhost:8000/tasks/${id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
